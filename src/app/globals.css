@@ -1,26 +1,118 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-obsidian: #090d16;
+    --color-violet-electric: #7c3aed;
+    --color-amber-gold: #f59e0b;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--color-obsidian);
+    color: #f3f4f6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    /* Deep cosmic ambient lighting setup using gradients */
+    background:
+      radial-gradient(
+        circle at 50% 0%,
+        rgba(124, 58, 237, 0.07) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        circle at 100% 60%,
+        rgba(245, 158, 11, 0.02) 0%,
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 0% 100%,
+        rgba(124, 58, 237, 0.03) 0%,
+        transparent 50%
+      ),
+      #090d16;
+    background-attachment: fixed;
+  }
+
+  /* Custom Selection highlight styling */
+  ::selection {
+    background-color: rgba(124, 58, 237, 0.3); /* Transparent Electric Violet */
+    color: #ffffff;
+  }
+
+  /* Ultra-sleek Custom Scrollbar Design */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #05070b; /* Deep obsidian backing */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #7c3aed, #4c1d95);
+    border-radius: 9999px;
+    border: 2px solid #05070b; /* Mimics padding gap */
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #f59e0b, #7c3aed);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* High-end Glassmorphic Panel Core Utility */
+  .glass-panel {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      rgba(255, 255, 255, 0.01) 100%
+    );
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 8px 32px 0 rgba(124, 58, 237, 0.06),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Premium interactive glow response for marketplace items */
+  .glass-panel-interactive:hover {
+    border-color: rgba(124, 58, 237, 0.25);
+    box-shadow:
+      0 12px 40px 0 rgba(124, 58, 237, 0.15),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+  }
+
+  /* Elegant SaaS Typography Gradients */
+  .text-gradient-cosmic {
+    background: linear-gradient(135deg, #ffffff 20%, #a78bfa 70%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    background-clip: text; /* 👈 Added to fix the warning */
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-violet {
+    background: linear-gradient(135deg, #c084fc 0%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    background-clip: text; /* 👈 Added to fix the warning */
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-amber {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    background-clip: text; /* 👈 Added to fix the warning */
+    -webkit-text-fill-color: transparent;
+  }
 }
