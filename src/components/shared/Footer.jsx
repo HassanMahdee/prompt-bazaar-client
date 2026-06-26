@@ -1,152 +1,130 @@
-"use client";
-
-import React from "react";
 import Link from "next/link";
-import { HiLightningBolt } from "react-icons/hi";
-import { FaTwitter, FaGithub, FaDiscord } from "react-icons/fa";
+import {
+  HiOutlineCode,
+  HiOutlineGlobeAlt,
+  HiOutlineTerminal,
+} from "react-icons/hi";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
+  const footerGroups = [
+    {
+      title: "Marketplace Matrices",
+      links: [
+        { name: "LLM Synthetics", href: "/marketplace?category=llm" },
+        {
+          name: "Diffusion Architecture",
+          href: "/marketplace?category=diffusion",
+        },
+        {
+          name: "Automation Pipelines",
+          href: "/marketplace?category=automations",
+        },
+        { name: "Trending Pipelines", href: "/marketplace?sort=popular" },
+      ],
+    },
+    {
+      title: "Core Protocols",
+      links: [
+        { name: "API Documentation", href: "/docs/api" },
+        { name: "Better Auth Integration", href: "/docs/auth" },
+        { name: "Aggregation Models", href: "/docs/aggregation" },
+        { name: "System Terminal Status", href: "/status" },
+      ],
+    },
+    {
+      title: "Platform Shell",
+      links: [
+        { name: "Enterprise Contracts", href: "/enterprise" },
+        { name: "Security Verification", href: "/security" },
+        { name: "Terms of Compliance", href: "/terms" },
+        { name: "Privacy Node Data", href: "/privacy" },
+      ],
+    },
+  ];
+
   return (
-    <footer className="w-full bg-[#05070B] border-t border-white/5 text-slate-400 text-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Brand Summary Box */}
-          <div className="space-y-4 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="bg-gradient-to-tr from-violet-600 to-amber-500 p-1.5 rounded-lg shadow-sm">
-                <HiLightningBolt className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-bold text-lg text-white tracking-tight">
-                Prompt<span className="text-amber-500">Bazaar</span>
+    <footer className="w-full bg-obsidian-deep border-t border-white/5 mt-auto relative overflow-hidden">
+      {/* Structural Containment Grid Panel */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 sm:gap-10 pb-12 border-b border-white/5">
+          {/* Section 1: Core Brand Narrative Block */}
+          <div className="sm:col-span-2 space-y-4">
+            <Link href="/" className="inline-flex items-center gap-2">
+              <span className="font-display text-lg font-bold tracking-tight text-white">
+                PROMPT<span className="text-violet-electric">BAZAAR</span>
               </span>
             </Link>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              The premium, decentralized AI engine optimization marketplace for
-              modern engineers and creative prompt technologists.
+            <p className="text-xs sm:text-sm text-slate-400 font-sans leading-relaxed max-w-sm">
+              The premier decentralized sandbox ecosystem built specifically for
+              searching, trading, authenticating, and embedding optimization
+              blocks for neural network engines.
             </p>
-          </div>
-
-          {/* Links Column A */}
-          <div>
-            <h3 className="text-white font-semibold text-xs tracking-wider uppercase mb-4">
-              Marketplace
-            </h3>
-            <ul className="space-y-2 text-xs">
-              <li>
-                <Link
-                  href="/prompts?category=midjourney"
-                  className="hover:text-amber-500 transition-colors"
-                >
-                  Midjourney Prompts
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/prompts?category=chatgpt"
-                  className="hover:text-amber-500 transition-colors"
-                >
-                  ChatGPT Engineering
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/prompts?category=stable-diffusion"
-                  className="hover:text-amber-500 transition-colors"
-                >
-                  Stable Diffusion Vectors
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Links Column B */}
-          <div>
-            <h3 className="text-white font-semibold text-xs tracking-wider uppercase mb-4">
-              Platform Core
-            </h3>
-            <ul className="space-y-2 text-xs">
-              <li>
-                <Link
-                  href="/pricing"
-                  className="hover:text-amber-500 transition-colors"
-                >
-                  Pricing Matrices
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/leaderboard"
-                  className="hover:text-amber-500 transition-colors"
-                >
-                  Creator Standings
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/terms"
-                  className="hover:text-amber-500 transition-colors"
-                >
-                  License Agreement
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Social Media Vectors */}
-          <div>
-            <h3 className="text-white font-semibold text-xs tracking-wider uppercase mb-4">
-              Connect Ecosystem
-            </h3>
-            <div className="flex space-x-4 mb-4">
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition-colors text-lg"
-              >
-                <FaTwitter />
-              </a>
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition-colors text-lg"
-              >
-                <FaGithub />
-              </a>
-              <a
-                href="https://discord.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition-colors text-lg"
-              >
-                <FaDiscord />
-              </a>
+            {/* System Status Indicators Row */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-500/5 border border-emerald-500/10 text-emerald-400 text-[11px] font-mono rounded-full">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              All Processing Matrix Nodes Operational
             </div>
-            <p className="text-xs text-slate-600">
-              Real-time synchronization with active global AI clusters.
-            </p>
           </div>
+
+          {/* Section 2: Iterating Structural Matrix link listings */}
+          {footerGroups.map((group) => (
+            <div key={group.title} className="space-y-4">
+              <h3 className="font-display text-xs font-bold text-white uppercase tracking-wider">
+                {group.title}
+              </h3>
+              <ul className="space-y-2.5">
+                {group.links.map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      href={link.href}
+                      className="text-xs sm:text-sm text-slate-400 hover:text-amber-gold transition-colors font-sans duration-200"
+                    >
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        {/* Structural Isolation Strip */}
-        <div className="mt-12 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {currentYear} Prompt Bazaar Inc. All rights reserved.</p>
-          <div className="flex space-x-6">
-            <Link
-              href="/privacy"
-              className="hover:text-slate-300 transition-colors"
+        {/* Bottom Platform Licensing Frame and Social Badges */}
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <p className="text-xs text-slate-500 font-sans tracking-tight">
+            &copy; {currentYear} Prompt Bazaar Inc. Submitted as academic
+            certification artifact framework block. All rights reserved.
+          </p>
+
+          <div className="flex items-center gap-4 text-slate-400">
+            <a
+              href="https://github.com"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Github Trace Log"
+              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 hover:text-white transition-colors"
             >
-              Privacy Policy
-            </Link>
-            <Link
-              href="/terms"
-              className="hover:text-slate-300 transition-colors"
+              <HiOutlineCode className="w-4 h-4" />
+            </a>
+            <a
+              href="https://vercel.com"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Network Cluster Node"
+              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 hover:text-white transition-colors"
             >
-              Terms of Service
-            </Link>
+              <HiOutlineTerminal className="w-4 h-4" />
+            </a>
+            <a
+              href="https://google.com"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Global Matrix Anchor"
+              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 hover:text-white transition-colors"
+            >
+              <HiOutlineGlobeAlt className="w-4 h-4" />
+            </a>
           </div>
         </div>
       </div>

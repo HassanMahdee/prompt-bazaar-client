@@ -4,6 +4,37 @@
 
 @layer base {
   :root {
+    --font-display: "Space Grotesk", sans-serif;
+    --font-sans: "Plus Jakarta Sans", sans-serif;
+  }
+}
+
+/* Custom design system typography hooks override */
+.font-display {
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+
+.font-sans {
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Smooth micro-scrollbars for tech trace logs */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--violet-electric);
+}
+
+@layer base {
+  :root {
     --color-obsidian: #090d16;
     --color-violet-electric: #7c3aed;
     --color-amber-gold: #f59e0b;
