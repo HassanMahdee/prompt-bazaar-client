@@ -1,5 +1,5 @@
 import dns from "node:dns";
-dns.setServers(["8.8.8.8", "8.8.4.4"]);
+dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
 import "./globals.css";
 import Navbar from "@/components/shared/navbar/navbar";
 import Footer from "@/components/shared/footer/footer";

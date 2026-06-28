@@ -4,22 +4,19 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession, signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import {
-  FaBookmark,
-  FaUser,
-  FaSignOutAlt,
-  FaStar,
-  FaPlus,
-} from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import DashboardSidebar from "@/components/shared/dashboard-sidebar/DashboardSidebar";
 import { get, del } from "@/lib/api";
 import Link from "next/link";
 
 export default function UserDashboard() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("profile");
+  const [activeTab, setActiveTab] = useState("add-prompt");
   const [bookmarks, setBookmarks] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
+  const [myPrompts, setMyPrompts] = useState([]);
+  const [myReviews, setMyReviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const hasLoadedProfile = useRef(false);
 
@@ -48,12 +45,40 @@ export default function UserDashboard() {
     }
   }, [session]);
 
+  const fetchMyPrompts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await get(`/prompts/creator/${session?.user?.email}`);
+      setMyPrompts(data.data || []);
+    } catch (err) {
+      toast.error("Failed to load prompts");
+    } finally {
+      setLoading(false);
+    }
+  }, [session]);
+
+  const fetchMyReviews = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await get(`/reviews/user/${session?.user?.email}`);
+      setMyReviews(data.data || []);
+    } catch (err) {
+      toast.error("Failed to load reviews");
+    } finally {
+      setLoading(false);
+    }
+  }, [session]);
+
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     if (tab === "saved") {
       fetchBookmarks();
     } else if (tab === "profile") {
       fetchUserProfile();
+    } else if (tab === "my-prompts") {
+      fetchMyPrompts();
+    } else if (tab === "my-reviews") {
+      fetchMyReviews();
     }
   };
 
@@ -79,203 +104,284 @@ export default function UserDashboard() {
     }
   };
 
+  const handleDeletePrompt = async (promptId) => {
+    if (!confirm("Are you sure you want to delete this prompt?")) return;
+    try {
+      await del(`/prompts/${promptId}`);
+      toast.success("Prompt deleted successfully");
+      fetchMyPrompts();
+    } catch (err) {
+      toast.error("Failed to delete prompt");
+    }
+  };
+
   if (!session) {
     return null;
   }
 
   return (
-    <div className="container-xy">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar */}
-          <div className="lg:w-64">
+    <div className="flex h-screen">
+      <DashboardSidebar
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        dashboardType="user"
+      />
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-y-auto bg-base-200 p-8">
+        {activeTab === "add-prompt" && (
+          <>
             <div className="card bg-base-100 shadow-lg">
               <div className="card-body">
-                <div className="flex flex-col items-center mb-6">
-                  <div className="avatar placeholder mb-3">
-                    <div className="bg-neutral text-neutral-content rounded-full w-20">
-                      <span className="text-2xl">
-                        {session?.user?.name?.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
-                  <h2 className="text-xl font-bold">{session?.user?.name}</h2>
-                  <p className="text-sm text-base-content/70">
-                    {session?.user?.email}
-                  </p>
-                  <div className="badge badge-primary mt-2">
-                    {session?.user?.role}
-                  </div>
-                  <div className="badge badge-secondary mt-1">
-                    {session?.user?.subscription}
-                  </div>
+                <h2 className="card-title text-2xl mb-4">Add Prompt</h2>
+                <p className="text-base-content/70 mb-6">
+                  Create a new prompt. Free users can add only 3 prompts.
+                </p>
+                <div className="alert alert-info mb-6">
+                  <span>
+                    All newly submitted prompts are automatically marked as
+                    pending and remain hidden from the marketplace until
+                    reviewed by an admin.
+                  </span>
                 </div>
-
-                <div className="divider"></div>
-
-                <ul className="menu menu-vertical bg-base-200 rounded-box">
-                  <li>
-                    <a
-                      className={activeTab === "profile" ? "active" : ""}
-                      onClick={() => handleTabChange("profile")}
-                    >
-                      <FaUser className="mr-2" />
-                      Profile
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      className={activeTab === "saved" ? "active" : ""}
-                      onClick={() => handleTabChange("saved")}
-                    >
-                      <FaBookmark className="mr-2" />
-                      Saved Prompts
-                    </a>
-                  </li>
-                  {(session?.user?.role === "creator" ||
-                    session?.user?.role === "admin") && (
-                    <li>
-                      <Link
-                        href="/dashboard/creator"
-                        className="flex items-center gap-2"
-                      >
-                        <FaPlus className="mr-2" />
-                        Creator Dashboard
-                      </Link>
-                    </li>
-                  )}
-                  <li>
-                    <button onClick={handleLogout} className="text-error">
-                      <FaSignOutAlt className="mr-2" />
-                      Logout
-                    </button>
-                  </li>
-                </ul>
+                <Link
+                  href="/dashboard/create-prompt"
+                  className="btn btn-primary w-full"
+                >
+                  <FaPlus className="mr-2" />
+                  Create New Prompt
+                </Link>
               </div>
             </div>
-          </div>
+          </>
+        )}
 
-          {/* Main Content */}
-          <div className="flex-1">
-            {activeTab === "profile" && (
-              <>
-                <div className="card bg-base-100 shadow-lg mb-6">
-                  <div className="card-body">
-                    <h2 className="card-title text-2xl mb-4">Profile</h2>
-                    {userProfile ? (
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-4">
-                          <div className="avatar placeholder">
-                            <div className="bg-neutral text-neutral-content rounded-full w-20">
-                              <span className="text-2xl">
-                                {userProfile.name?.charAt(0).toUpperCase() ||
-                                  "U"}
-                              </span>
-                            </div>
-                          </div>
-                          <div>
-                            <h3 className="text-xl font-semibold">
-                              {userProfile.name}
-                            </h3>
-                            <p className="text-base-content/70">
-                              {userProfile.email}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 mt-4">
-                          <div className="stat bg-base-200 rounded-lg">
-                            <div className="stat-title">Role</div>
-                            <div className="stat-value text-lg">
-                              {userProfile.role}
-                            </div>
-                          </div>
-                          <div className="stat bg-base-200 rounded-lg">
-                            <div className="stat-title">Subscription</div>
-                            <div className="stat-value text-lg">
-                              {userProfile.subscription}
-                            </div>
-                          </div>
-                          <div className="stat bg-base-200 rounded-lg">
-                            <div className="stat-title">Total Prompts</div>
-                            <div className="stat-value text-lg">
-                              {userProfile.promptCount || 0}
-                            </div>
-                          </div>
-                        </div>
-                        {userProfile.subscription === "free" && (
-                          <div className="alert alert-info mt-4">
-                            <div className="flex items-center justify-between">
-                              <span>
-                                Upgrade to Premium for unlimited access
-                              </span>
-                              <button
-                                onClick={() => router.push("/payment")}
-                                className="btn btn-primary btn-sm"
-                              >
-                                Upgrade
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="loading loading-spinner"></span>
-                    )}
-                  </div>
+        {activeTab === "my-prompts" && (
+          <>
+            <div className="card bg-base-100 shadow-lg">
+              <div className="card-body">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="card-title text-2xl">My Prompts</h2>
+                  <Link
+                    href="/dashboard/create-prompt"
+                    className="btn btn-primary"
+                  >
+                    <FaPlus className="mr-2" />
+                    Add New Prompt
+                  </Link>
                 </div>
-              </>
-            )}
-
-            {activeTab === "saved" && (
-              <>
-                <div className="card bg-base-100 shadow-lg">
-                  <div className="card-body">
-                    <h2 className="card-title text-2xl mb-4">Saved Prompts</h2>
-                    {loading ? (
-                      <div className="flex justify-center py-12">
-                        <span className="loading loading-spinner loading-lg"></span>
-                      </div>
-                    ) : bookmarks.length === 0 ? (
-                      <p className="text-base-content/70 text-center py-12">
-                        No saved prompts yet
-                      </p>
-                    ) : (
-                      <div className="space-y-3">
-                        {bookmarks.map((prompt) => (
-                          <div
-                            key={prompt._id}
-                            className="flex items-center justify-between p-3 bg-base-200 rounded-lg"
-                          >
-                            <div className="flex-1">
-                              <h4 className="font-semibold">{prompt.title}</h4>
-                              <p className="text-sm text-base-content/70">
-                                {prompt.aiTool} • {prompt.category}
-                              </p>
-                            </div>
-                            <div className="flex gap-2">
-                              <Link
-                                href={`/prompts/${prompt._id}`}
-                                className="btn btn-sm btn-outline"
+                {loading ? (
+                  <div className="flex justify-center py-12">
+                    <span className="loading loading-spinner loading-lg"></span>
+                  </div>
+                ) : myPrompts.length === 0 ? (
+                  <p className="text-base-content/70 text-center py-12">
+                    No prompts created yet
+                  </p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>Prompt Title</th>
+                          <th>Category</th>
+                          <th>Status</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {myPrompts.map((prompt) => (
+                          <tr key={prompt._id}>
+                            <td>{prompt.title}</td>
+                            <td>{prompt.category}</td>
+                            <td>
+                              <span
+                                className={`badge ${prompt.status === "published" ? "badge-success" : prompt.status === "rejected" ? "badge-error" : "badge-warning"}`}
                               >
-                                View
-                              </Link>
-                              <button
-                                onClick={() => handleRemoveBookmark(prompt._id)}
-                                className="btn btn-sm btn-error"
-                              >
-                                Remove
-                              </button>
-                            </div>
-                          </div>
+                                {prompt.status}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="flex gap-2">
+                                <Link
+                                  href={`/dashboard/edit-prompt/${prompt._id}`}
+                                  className="btn btn-sm btn-ghost"
+                                >
+                                  <FaEdit />
+                                </Link>
+                                <button
+                                  onClick={() => handleDeletePrompt(prompt._id)}
+                                  className="btn btn-sm btn-error btn-ghost"
+                                >
+                                  <FaTrash />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
                         ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+
+        {activeTab === "my-reviews" && (
+          <>
+            <div className="card bg-base-100 shadow-lg">
+              <div className="card-body">
+                <h2 className="card-title text-2xl mb-4">My Reviews</h2>
+                {loading ? (
+                  <div className="flex justify-center py-12">
+                    <span className="loading loading-spinner loading-lg"></span>
+                  </div>
+                ) : myReviews.length === 0 ? (
+                  <p className="text-base-content/70 text-center py-12">
+                    No reviews submitted yet
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {myReviews.map((review) => (
+                      <div
+                        key={review._id}
+                        className="flex items-center justify-between p-3 bg-base-200 rounded-lg"
+                      >
+                        <div className="flex-1">
+                          <h4 className="font-semibold">
+                            {review.promptTitle}
+                          </h4>
+                          <p className="text-sm text-base-content/70">
+                            Rating: {review.rating}/5
+                          </p>
+                          <p className="text-sm text-base-content/70 mt-1">
+                            {review.comment}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+
+        {activeTab === "profile" && (
+          <>
+            <div className="card bg-base-100 shadow-lg mb-6">
+              <div className="card-body">
+                <h2 className="card-title text-2xl mb-4">Profile</h2>
+                {userProfile ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <div className="avatar placeholder">
+                        <div className="bg-neutral text-neutral-content rounded-full w-20">
+                          <span className="text-2xl">
+                            {userProfile.name?.charAt(0).toUpperCase() || "U"}
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold">
+                          {userProfile.name}
+                        </h3>
+                        <p className="text-base-content/70">
+                          {userProfile.email}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      <div className="stat bg-base-200 rounded-lg">
+                        <div className="stat-title">Role</div>
+                        <div className="stat-value text-lg">
+                          {userProfile.role}
+                        </div>
+                      </div>
+                      <div className="stat bg-base-200 rounded-lg">
+                        <div className="stat-title">Subscription</div>
+                        <div className="stat-value text-lg">
+                          {userProfile.subscription}
+                        </div>
+                      </div>
+                      <div className="stat bg-base-200 rounded-lg">
+                        <div className="stat-title">Total Prompts</div>
+                        <div className="stat-value text-lg">
+                          {userProfile.promptCount || 0}
+                        </div>
+                      </div>
+                    </div>
+                    {userProfile.subscription === "free" && (
+                      <div className="alert alert-info mt-4">
+                        <div className="flex items-center justify-between">
+                          <span>Upgrade to Premium for unlimited access</span>
+                          <button
+                            onClick={() => router.push("/payment")}
+                            className="btn btn-primary btn-sm"
+                          >
+                            Upgrade
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+                ) : (
+                  <span className="loading loading-spinner"></span>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+
+        {activeTab === "saved" && (
+          <>
+            <div className="card bg-base-100 shadow-lg">
+              <div className="card-body">
+                <h2 className="card-title text-2xl mb-4">Saved Prompts</h2>
+                {loading ? (
+                  <div className="flex justify-center py-12">
+                    <span className="loading loading-spinner loading-lg"></span>
+                  </div>
+                ) : bookmarks.length === 0 ? (
+                  <p className="text-base-content/70 text-center py-12">
+                    No saved prompts yet
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {bookmarks.map((prompt) => (
+                      <div
+                        key={prompt._id}
+                        className="flex items-center justify-between p-3 bg-base-200 rounded-lg"
+                      >
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{prompt.title}</h4>
+                          <p className="text-sm text-base-content/70">
+                            {prompt.aiTool} • {prompt.category}
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Link
+                            href={`/prompts/${prompt._id}`}
+                            className="btn btn-sm btn-outline"
+                          >
+                            View
+                          </Link>
+                          <button
+                            onClick={() => handleRemoveBookmark(prompt._id)}
+                            className="btn btn-sm btn-error"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

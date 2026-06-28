@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { NavPath } from "./navbarPath";
 import { signOut, useSession } from "@/lib/auth-client";
@@ -59,6 +58,9 @@ export default function Navbar() {
             >
               <li className="px-3 py-2 text-sm font-semibold text-base-content/60">
                 {session.user?.name}
+              </li>
+              <li className="px-3 py-2 text-sm text-base-content/50">
+                {session.user?.role}
               </li>
               <li>
                 <Link href="/dashboard">Dashboard</Link>
