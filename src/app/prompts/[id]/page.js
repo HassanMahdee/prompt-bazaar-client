@@ -12,6 +12,7 @@ import {
   FaStar,
 } from "react-icons/fa";
 import { get, post, patch, del } from "@/lib/api";
+import AddReview from "@/components/addReview/addReview";
 
 export default function PromptDetailPage({ params }) {
   const { data: session } = useSession();
@@ -267,6 +268,7 @@ export default function PromptDetailPage({ params }) {
               <p className="text-base-content/70">No reviews yet</p>
             )}
           </div>
+          <AddReview promptId={promptId} setPrompt={setPrompt} />
         </div>
       </div>
 
