@@ -39,7 +39,6 @@ export default function AllPrompts() {
         };
 
         const response = await get("/prompts", params);
-        console.log("Response:", response);
         setPrompts(response.data || []);
         setTotalPages(response.totalPages || 1);
       } catch (err) {

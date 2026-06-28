@@ -1,30 +1,12 @@
-import { authClient } from "./auth-client";
-import { headers } from "next/headers";
-
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export async function fetchAPI(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
 
-  // async function getAuthToken() {
-  //   const session = await auth.api.getSession({
-  //     headers: await headers(),
-  //   });
-  //   console.log("Session:", session);
-  //   return session?.token || null;
-  // }
-
-  const { token, user } = await authClient.useSession({
-    headers: await headers(),
-  });
-  console.log("Token:", token);
-  console.log("User:", user);
-
   const defaultOptions = {
     headers: {
       "Content-Type": "application/json",
       ...options.headers,
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
   };
 
