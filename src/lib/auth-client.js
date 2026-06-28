@@ -1,9 +1,7 @@
 import { createAuthClient } from "better-auth/react";
 
-// Initialize the auth client using the backend URL from your environment variables
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "http://localhost:3000",
 });
 
-// Export hooks for easy access in components
-export const { useSession, signIn, signUp, signOut } = authClient;
+export const { signIn, signUp, signOut, useSession } = authClient;

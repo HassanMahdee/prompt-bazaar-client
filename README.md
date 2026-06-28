@@ -1,36 +1,152 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Prompt Bazaar
+
+An AI Prompt Sharing & Marketplace Platform built with Next.js, React, and Tailwind CSS. This platform allows users to discover, share, and monetize AI prompts across various AI tools like ChatGPT, Claude, Gemini, and Midjourney.
+
+## Features
+
+- **Homepage**: Featured prompts and top creators with Framer Motion animations
+- **All Prompts Page**: Server-side filtering, sorting, and pagination
+- **Prompt Details**: View prompt content, copy to clipboard, bookmark, and report functionality
+- **User Dashboard**: Profile management, saved prompts, and subscription status
+- **Creator Dashboard**: Analytics charts, prompt management, and performance tracking
+- **Admin Dashboard**: User management, prompt moderation, and reports handling
+- **Payment Integration**: Stripe integration for premium subscriptions
+- **Authentication**: Better-auth integration with role-based access control
+
+## Tech Stack
+
+- **Frontend**: Next.js (App Router), React
+- **Styling**: Tailwind CSS, DaisyUI
+- **Animations**: Framer Motion
+- **Icons**: React Icons
+- **Charts**: Recharts
+- **Notifications**: React Toastify
+- **Authentication**: Better-auth
+- **API**: Native fetch with custom helper utilities
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ installed
+- Backend API running on `http://localhost:5000`
+- Environment variables configured
+
+### Installation
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create a `.env.local` file in the root directory:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000
+```
+
+3. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) with your browser
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/                      # Next.js app directory
+│   ├── all-prompts/          # All prompts listing page
+│   ├── dashboard/            # User, creator, and admin dashboards
+│   ├── payment/              # Stripe payment integration
+│   ├── profile/              # User profile page
+│   ├── prompts/[id]/         # Prompt details page
+│   ├── error.js              # Error boundary
+│   ├── not-found.js          # 404 page
+│   ├── layout.js             # Root layout with ToastContainer
+│   └── page.js               # Homepage
+├── components/              # React components
+│   ├── all-prompts/          # All prompts components
+│   ├── homepage/             # Homepage components
+│   └── shared/               # Shared components (navbar, etc.)
+├── lib/                      # Utilities
+│   ├── api.js                # API helper utilities
+│   └── auth-client.js        # Authentication client
+└── app/
+    └── globals.css           # Global styles
+```
 
-## Learn More
+## API Integration
 
-To learn more about Next.js, take a look at the following resources:
+The application uses a custom API helper (`src/lib/api.js`) that wraps native fetch with error handling and JSON parsing:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```javascript
+import { get, post, patch, del } from "@/lib/api";
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+// GET request
+const data = await get("/prompts");
 
-## Deploy on Vercel
+// POST request
+const result = await post("/bookmarks", { promptId: "123" });
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+// PATCH request
+await patch("/prompts/123/status", { status: "published" });
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+// DELETE request
+await del("/bookmarks/123");
+```
+
+## Authentication
+
+The application uses Better-auth for authentication. Session management is handled through the `useSession` hook:
+
+```javascript
+import { useSession } from "@/lib/auth-client";
+
+const { data: session, isPending } = useSession();
+```
+
+## Available Routes
+
+- `/` - Homepage
+- `/all-prompts` - Browse all prompts with filters
+- `/prompts/[id]` - View prompt details
+- `/dashboard` - User dashboard
+- `/dashboard/creator` - Creator dashboard
+- `/dashboard/admin` - Admin dashboard
+- `/payment` - Upgrade to premium
+- `/profile` - User profile
+- `/login` - Login page
+- `/register` - Registration page
+
+## Role-Based Access
+
+- **User**: Can browse prompts, save bookmarks, and upgrade to premium
+- **Creator**: Can create and manage prompts, view analytics
+- **Admin**: Can manage users, moderate prompts, and handle reports
+
+## Premium Features
+
+Premium users get:
+
+- Access to all prompts (including private/premium prompts)
+- Unlimited bookmarks
+- Priority support
+- Ad-free experience
+
+## Deployment
+
+The easiest way to deploy is using [Vercel](https://vercel.com/new):
+
+```bash
+npm run build
+```
+
+Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## License
+
+This project is part of an assignment for educational purposes.
