@@ -93,7 +93,7 @@ export default function AdminDashboard() {
   const fetchAllPrompts = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await get("/prompts");
+      const data = await get("/prompts/all-prompts-admin");
       setAllPrompts(data.data || []);
     } catch (err) {
       toast.error("Failed to load prompts");
@@ -127,7 +127,7 @@ export default function AdminDashboard() {
           const data = await get("/user");
           setUsers(data || []);
         } else if (activeTab === "all-prompts") {
-          const data = await get("/prompts");
+          const data = await get("/prompts/all-prompts-admin");
           setAllPrompts(data.data || []);
         } else if (activeTab === "payments") {
           const data = await get("/payments");
@@ -170,19 +170,18 @@ export default function AdminDashboard() {
 
   const handleApprovePrompt = async (promptId) => {
     try {
-      await patch(`/prompts/${promptId}/status`, { status: "published" });
+      await patch(`/prompts/${promptId}/status`, { status: "approved" });
       toast.success("Prompt approved successfully");
-      fetchPendingPrompts();
+      fetchAllPrompts();
     } catch (err) {
       toast.error("Failed to approve prompt");
     }
   };
 
-  const handleRejectPrompt = async (promptId, feedback) => {
+  const handleRejectPrompt = async (promptId) => {
     try {
       await patch(`/prompts/${promptId}/status`, {
         status: "rejected",
-        feedback,
       });
       toast.success("Prompt rejected successfully");
       fetchAllPrompts();
@@ -193,7 +192,7 @@ export default function AdminDashboard() {
 
   const handleFeaturePrompt = async (promptId) => {
     try {
-      await patch(`/prompts/${promptId}/feature`, { featured: true });
+      await patch(`/prompts/${promptId}/featured`, { featured: true });
       toast.success("Prompt featured successfully");
       fetchAllPrompts();
     } catch (err) {
@@ -203,7 +202,7 @@ export default function AdminDashboard() {
 
   const handleUnfeaturePrompt = async (promptId) => {
     try {
-      await patch(`/prompts/${promptId}/feature`, { featured: false });
+      await patch(`/prompts/${promptId}/featured`, { featured: false });
       toast.success("Prompt unfeatured successfully");
       fetchAllPrompts();
     } catch (err) {
@@ -514,14 +513,7 @@ export default function AdminDashboard() {
                                     </button>
                                     <button
                                       onClick={() => {
-                                        const feedback = prompt(
-                                          "Enter rejection feedback:",
-                                        );
-                                        if (feedback)
-                                          handleRejectPrompt(
-                                            prompt._id,
-                                            feedback,
-                                          );
+                                        handleRejectPrompt(prompt._id);
                                       }}
                                       className="btn btn-sm btn-error btn-ghost"
                                     >

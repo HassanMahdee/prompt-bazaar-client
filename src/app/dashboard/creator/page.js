@@ -28,6 +28,7 @@ import {
 } from "recharts";
 import Link from "next/link";
 import AddPrompt from "@/components/addPrompt/addPrompt";
+import UpdatePromptModal from "@/components/addPrompt/updatePromptModal";
 
 export default function CreatorDashboard() {
   const { data: session } = useSession();
@@ -37,6 +38,8 @@ export default function CreatorDashboard() {
   const [myPrompts, setMyPrompts] = useState([]);
   const [totalReviews, setTotalReviews] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedPrompt, setSelectedPrompt] = useState(null);
   const hasLoadedInitial = useRef(false);
 
   const fetchAnalytics = useCallback(async () => {
@@ -71,7 +74,7 @@ export default function CreatorDashboard() {
     setActiveTab(tab);
     if (tab === "analytics") {
       fetchAnalytics();
-    } else if (tab === "prompts" && myPrompts.length === 0) {
+    } else if (tab === "my-prompts" && myPrompts.length === 0) {
       fetchMyPrompts();
     }
   };
@@ -99,7 +102,7 @@ export default function CreatorDashboard() {
     try {
       await del(`/prompts/${promptId}`);
       toast.success("Prompt deleted successfully");
-      fetchMyPrompts();
+      setMyPrompts(fetchMyPrompts());
     } catch (err) {
       toast.error("Failed to delete prompt");
     }
@@ -236,7 +239,7 @@ export default function CreatorDashboard() {
         {activeTab === "create-prompt" && (
           <>
             <div className="card bg-base-100 shadow-lg mb-6">
-              <div className="card-body">
+              <div className="card-body ">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="card-title text-2xl">Creator Dashboard</h2>
                 </div>
@@ -258,17 +261,10 @@ export default function CreatorDashboard() {
 
         {activeTab === "my-prompts" && (
           <>
-            <div className="card bg-base-100 shadow-lg">
+            <div className="card bg-base-100 shadow-lg ">
               <div className="card-body">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="card-title text-2xl">My Prompts</h2>
-                  <Link
-                    href="/dashboard/create-prompt"
-                    className="btn btn-primary"
-                  >
-                    <FaPlus className="mr-2" />
-                    Create New Prompt
-                  </Link>
                 </div>
                 <p className="text-base-content/70">
                   Manage your prompts and track their performance.
@@ -282,7 +278,7 @@ export default function CreatorDashboard() {
                     No prompts created yet
                   </p>
                 ) : (
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto ">
                     <table className="table">
                       <thead>
                         <tr>
@@ -310,12 +306,15 @@ export default function CreatorDashboard() {
                             </td>
                             <td>
                               <div className="flex gap-2">
-                                <Link
-                                  href={`/dashboard/edit-prompt/${prompt._id}`}
+                                <button
+                                  onClick={() => {
+                                    setIsOpen(true);
+                                    setSelectedPrompt(prompt);
+                                  }}
                                   className="btn btn-sm btn-ghost"
                                 >
                                   <FaEdit />
-                                </Link>
+                                </button>
                                 <button
                                   onClick={() => handleDeletePrompt(prompt._id)}
                                   className="btn btn-sm btn-error btn-ghost"
@@ -328,6 +327,17 @@ export default function CreatorDashboard() {
                         ))}
                       </tbody>
                     </table>
+                    {isOpen && (
+                      <UpdatePromptModal
+                        setMyPrompts={setMyPrompts}
+                        fetchMyPrompts={fetchMyPrompts}
+                        prompt={selectedPrompt}
+                        onClose={() => {
+                          setIsOpen(false);
+                          setSelectedPrompt(null);
+                        }}
+                      />
+                    )}
                   </div>
                 )}
               </div>
