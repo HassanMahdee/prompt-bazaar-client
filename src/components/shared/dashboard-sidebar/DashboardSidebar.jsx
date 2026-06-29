@@ -13,6 +13,7 @@ import {
   FaUserShield,
   FaStar,
   FaChartBar,
+  FaRegChartBar,
 } from "react-icons/fa";
 
 const DashboardSidebar = ({ activeTab, onTabChange, dashboardType }) => {
@@ -25,6 +26,7 @@ const DashboardSidebar = ({ activeTab, onTabChange, dashboardType }) => {
   ];
 
   const creatorMenu = [
+    { key: "analytics", label: "Analytics", icon: FaRegChartBar },
     { key: "create-prompt", label: "Create Prompt", icon: FaPlus },
     { key: "my-prompts", label: "My Prompts", icon: FaEdit },
   ];
@@ -52,16 +54,6 @@ const DashboardSidebar = ({ activeTab, onTabChange, dashboardType }) => {
 
   return (
     <aside className="w-64 h-screen flex flex-col bg-base-100 border-r border-base-200">
-      {/* Brand / Logo */}
-      <div className="px-6 py-5 border-b border-base-200">
-        <Link
-          href="/"
-          className="text-xl font-bold text-primary flex items-center gap-2"
-        >
-          Prompt-Bazaar
-        </Link>
-      </div>
-
       {/* User Profile */}
       <div className="px-6 py-5 border-b border-base-200">
         <div className="flex items-center gap-3">

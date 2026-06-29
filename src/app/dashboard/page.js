@@ -12,7 +12,7 @@ import Link from "next/link";
 export default function UserDashboard() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("add-prompt");
+  const [activeTab, setActiveTab] = useState("profile");
   const [bookmarks, setBookmarks] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
   const [myReviews, setMyReviews] = useState([]);
