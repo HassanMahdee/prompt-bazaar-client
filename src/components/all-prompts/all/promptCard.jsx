@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import { FaCopy, FaEye, FaStar } from "react-icons/fa";
 
 export default function PromptCard({ prompt }) {
