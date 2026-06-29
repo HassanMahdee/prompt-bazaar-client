@@ -19,6 +19,9 @@ import {
   Line,
   BarChart,
   Bar,
+  PieChart,
+  Pie,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -50,7 +53,7 @@ export default function CreatorDashboard() {
         `/analytics/creator-summary/${session?.user?.email}`,
       );
       console.log("Analytics data:", data);
-      setAnalytics(data.data);
+      setAnalytics(data);
     } catch (err) {
       toast.error("Failed to load analytics");
     } finally {
@@ -87,7 +90,7 @@ export default function CreatorDashboard() {
           const data = await get(
             `/analytics/creator-summary/${session.user.email}`,
           );
-          setAnalytics(data.data);
+          setAnalytics(data);
         } catch (err) {
           toast.error("Failed to load analytics");
         }
@@ -129,100 +132,76 @@ export default function CreatorDashboard() {
                 <h2 className="card-title text-2xl mb-4">Analytics</h2>
                 {analytics ? (
                   <>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                       <div className="stats shadow bg-base-100">
                         <div className="stat">
                           <div className="stat-title">Total Prompts</div>
                           <div className="stat-value text-primary">
                             {analytics.totalPrompts || 0}
                           </div>
-                          <div className="stat-desc">Published</div>
+                          <div className="stat-desc">All prompts</div>
                         </div>
                       </div>
                       <div className="stats shadow bg-base-100">
                         <div className="stat">
-                          <div className="stat-title">Total Copies</div>
-                          <div className="stat-value text-secondary">
-                            {analytics.totalCopies || 0}
+                          <div className="stat-title">Approved</div>
+                          <div className="stat-value text-success">
+                            {analytics.approvedPrompts || 0}
                           </div>
-                          <div className="stat-desc">All time</div>
+                          <div className="stat-desc">Approved prompts</div>
                         </div>
                       </div>
                       <div className="stats shadow bg-base-100">
                         <div className="stat">
-                          <div className="stat-title">Avg Rating</div>
-                          <div className="stat-value text-accent">
-                            {analytics.averageRating?.toFixed(1) || 0}
+                          <div className="stat-title">Pending</div>
+                          <div className="stat-value text-warning">
+                            {analytics.pendingPrompts || 0}
                           </div>
-                          <div className="stat-desc">Out of 5</div>
-                        </div>
-                      </div>
-                      <div className="stats shadow bg-base-100">
-                        <div className="stat">
-                          <div className="stat-title">Total Reviews</div>
-                          <div className="stat-value">
-                            {analytics.totalReviews || 0}
-                          </div>
-                          <div className="stat-desc">Received</div>
+                          <div className="stat-desc">Pending prompts</div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                      <div className="card bg-base-100 shadow-lg">
-                        <div className="card-body">
-                          <h3 className="card-title text-xl mb-4">
-                            Prompt Performance
-                          </h3>
-                          <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={analytics.promptPerformance || []}>
-                              <CartesianGrid strokeDasharray="3 3" />
-                              <XAxis dataKey="title" />
-                              <YAxis />
-                              <Tooltip />
-                              <Legend />
-                              <Bar
-                                dataKey="copies"
-                                fill="#6366f1"
-                                name="Copies"
-                              />
-                              <Bar
-                                dataKey="rating"
-                                fill="#ec4899"
-                                name="Rating"
-                              />
-                            </BarChart>
-                          </ResponsiveContainer>
-                        </div>
-                      </div>
-
-                      <div className="card bg-base-100 shadow-lg">
-                        <div className="card-body">
-                          <h3 className="card-title text-xl mb-4">
-                            Monthly Growth
-                          </h3>
-                          <ResponsiveContainer width="100%" height={300}>
-                            <LineChart data={analytics.monthlyGrowth || []}>
-                              <CartesianGrid strokeDasharray="3 3" />
-                              <XAxis dataKey="month" />
-                              <YAxis />
-                              <Tooltip />
-                              <Legend />
-                              <Line
-                                type="monotone"
-                                dataKey="copies"
-                                stroke="#6366f1"
-                                name="Copies"
-                              />
-                              <Line
-                                type="monotone"
-                                dataKey="reviews"
-                                stroke="#ec4899"
-                                name="Reviews"
-                              />
-                            </LineChart>
-                          </ResponsiveContainer>
-                        </div>
+                    <div className="card bg-base-100 shadow-lg">
+                      <div className="card-body">
+                        <h3 className="card-title text-xl mb-4">
+                          Engagement Metrics
+                        </h3>
+                        <ResponsiveContainer width="100%" height={400}>
+                          <PieChart>
+                            <Pie
+                              data={[
+                                {
+                                  name: "Total Copies",
+                                  value: analytics.totalCopies || 0,
+                                },
+                                {
+                                  name: "Total Reviews",
+                                  value: analytics.totalReviews || 0,
+                                },
+                                {
+                                  name: "Total Bookmarks",
+                                  value: analytics.totalBookmarks || 0,
+                                },
+                              ]}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              label={({ name, percent }) =>
+                                `${name}: ${(percent * 100).toFixed(0)}%`
+                              }
+                              outerRadius={120}
+                              fill="#8884d8"
+                              dataKey="value"
+                            >
+                              <Cell fill="#6366f1" />
+                              <Cell fill="#ec4899" />
+                              <Cell fill="#10b981" />
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
                       </div>
                     </div>
                   </>

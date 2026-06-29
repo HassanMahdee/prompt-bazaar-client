@@ -46,7 +46,7 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       const data = await get("/analytics/admin-summary");
-      setAdminStats(data.data);
+      setAdminStats(data);
     } catch (err) {
       toast.error("Failed to load admin stats");
     } finally {
@@ -122,10 +122,10 @@ export default function AdminDashboard() {
       try {
         if (activeTab === "analytics") {
           const data = await get("/analytics/admin-summary");
-          setAdminStats(data.data);
+          setAdminStats(data);
         } else if (activeTab === "users") {
           const data = await get("/user");
-          setUsers(data || []);
+          setUsers(data.data || []);
         } else if (activeTab === "all-prompts") {
           const data = await get("/prompts/all-prompts-admin");
           setAllPrompts(data.data || []);
@@ -212,7 +212,8 @@ export default function AdminDashboard() {
 
   const handleDismissReport = async (reportId) => {
     try {
-      await patch(`/reports/${reportId}/dismiss`);
+      console.log("Dismissing report:", reportId);
+      await del(`/reports/${reportId}`);
       toast.success("Report dismissed successfully");
       fetchReports();
     } catch (err) {
@@ -220,21 +221,9 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleWarnCreator = async (reportId) => {
+  const handleRemoveReportedPrompt = async (promptId) => {
     try {
-      await post(`/reports/${reportId}/warn`);
-      toast.success("Warning sent to creator successfully");
-      fetchReports();
-    } catch (err) {
-      toast.error("Failed to send warning");
-    }
-  };
-
-  const handleRemoveReportedPrompt = async (reportId) => {
-    if (!confirm("Are you sure you want to remove this prompt?")) return;
-
-    try {
-      await del(`/reports/${reportId}/prompt`);
+      await del(`/prompts/${promptId}`);
       toast.success("Prompt removed successfully");
       fetchReports();
     } catch (err) {
@@ -280,7 +269,7 @@ export default function AdminDashboard() {
 
             {adminStats ? (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6">
                   <div className="stats shadow bg-base-100">
                     <div className="stat">
                       <div className="stat-title">Total Users</div>
@@ -296,7 +285,34 @@ export default function AdminDashboard() {
                       <div className="stat-value text-secondary">
                         {adminStats.totalPrompts || 0}
                       </div>
-                      <div className="stat-desc">Published prompts</div>
+                      <div className="stat-desc">All prompts</div>
+                    </div>
+                  </div>
+                  <div className="stats shadow bg-base-100">
+                    <div className="stat">
+                      <div className="stat-title">Approved</div>
+                      <div className="stat-value text-success">
+                        {adminStats.approvedPrompts || 0}
+                      </div>
+                      <div className="stat-desc">Approved prompts</div>
+                    </div>
+                  </div>
+                  <div className="stats shadow bg-base-100">
+                    <div className="stat">
+                      <div className="stat-title">Pending</div>
+                      <div className="stat-value text-warning">
+                        {adminStats.pendingPrompts || 0}
+                      </div>
+                      <div className="stat-desc">Pending prompts</div>
+                    </div>
+                  </div>
+                  <div className="stats shadow bg-base-100">
+                    <div className="stat">
+                      <div className="stat-title">Rejected</div>
+                      <div className="stat-value text-error">
+                        {adminStats.rejectedPrompts || 0}
+                      </div>
+                      <div className="stat-desc">Rejected prompts</div>
                     </div>
                   </div>
                   <div className="stats shadow bg-base-100">
@@ -310,6 +326,15 @@ export default function AdminDashboard() {
                   </div>
                   <div className="stats shadow bg-base-100">
                     <div className="stat">
+                      <div className="stat-title">Total Bookmarks</div>
+                      <div className="stat-value text-info">
+                        {adminStats.totalBookmarks || 0}
+                      </div>
+                      <div className="stat-desc">User bookmarks</div>
+                    </div>
+                  </div>
+                  <div className="stats shadow bg-base-100">
+                    <div className="stat">
                       <div className="stat-title">Total Copies</div>
                       <div className="stat-value">
                         {adminStats.totalCopies || 0}
@@ -317,68 +342,98 @@ export default function AdminDashboard() {
                       <div className="stat-desc">Prompt copies</div>
                     </div>
                   </div>
+                  <div className="stats shadow bg-base-100">
+                    <div className="stat">
+                      <div className="stat-title">Total Reports</div>
+                      <div className="stat-value text-error">
+                        {adminStats.totalReports || 0}
+                      </div>
+                      <div className="stat-desc">Reported content</div>
+                    </div>
+                  </div>
+                  <div className="stats shadow bg-base-100">
+                    <div className="stat">
+                      <div className="stat-title">Total Payments</div>
+                      <div className="stat-value text-success">
+                        {adminStats.totalPayments || 0}
+                      </div>
+                      <div className="stat-desc">Completed payments</div>
+                    </div>
+                  </div>
+                  <div className="stats shadow bg-base-100">
+                    <div className="stat">
+                      <div className="stat-title">Total Revenue</div>
+                      <div className="stat-value text-success">
+                        ${adminStats.totalRevenue || 0}
+                      </div>
+                      <div className="stat-desc">Platform revenue</div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                   <div className="card bg-base-100 shadow-lg">
                     <div className="card-body">
-                      <h3 className="card-title text-xl mb-4">User Growth</h3>
+                      <h3 className="card-title text-xl mb-4">User Metrics</h3>
                       <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={adminStats.growthData || []}>
+                        <BarChart
+                          data={[
+                            {
+                              name: "Total Users",
+                              value: adminStats.totalUsers || 0,
+                            },
+                            {
+                              name: "Reviews",
+                              value: adminStats.totalReviews || 0,
+                            },
+                            {
+                              name: "Bookmarks",
+                              value: adminStats.totalBookmarks || 0,
+                            },
+                          ]}
+                        >
                           <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="month" />
+                          <XAxis dataKey="name" />
                           <YAxis />
                           <Tooltip />
                           <Legend />
-                          <Line
-                            type="monotone"
-                            dataKey="users"
-                            stroke="#6366f1"
-                            name="Users"
-                          />
-                        </LineChart>
+                          <Bar dataKey="value" fill="#6366f1" name="Count" />
+                        </BarChart>
                       </ResponsiveContainer>
                     </div>
                   </div>
 
                   <div className="card bg-base-100 shadow-lg">
                     <div className="card-body">
-                      <h3 className="card-title text-xl mb-4">Prompt Growth</h3>
+                      <h3 className="card-title text-xl mb-4">
+                        Revenue & Payments
+                      </h3>
                       <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={adminStats.growthData || []}>
+                        <BarChart
+                          data={[
+                            {
+                              name: "Revenue",
+                              value: adminStats.totalRevenue || 0,
+                            },
+                            {
+                              name: "Payments",
+                              value: adminStats.totalPayments || 0,
+                            },
+                          ]}
+                        >
                           <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="month" />
+                          <XAxis dataKey="name" />
                           <YAxis />
                           <Tooltip />
                           <Legend />
-                          <Line
-                            type="monotone"
-                            dataKey="prompts"
-                            stroke="#ec4899"
-                            name="Prompts"
+                          <Bar
+                            dataKey="value"
+                            fill="#10b981"
+                            name="Amount ($)"
                           />
-                        </LineChart>
+                        </BarChart>
                       </ResponsiveContainer>
                     </div>
-                  </div>
-                </div>
-
-                <div className="card bg-base-100 shadow-lg">
-                  <div className="card-body">
-                    <h3 className="card-title text-xl mb-4">
-                      Reviews & Copies Overview
-                    </h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={adminStats.growthData || []}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="month" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="reviews" fill="#10b981" name="Reviews" />
-                        <Bar dataKey="copies" fill="#f59e0b" name="Copies" />
-                      </BarChart>
-                    </ResponsiveContainer>
                   </div>
                 </div>
               </>
@@ -626,13 +681,13 @@ export default function AdminDashboard() {
                               </p>
                             </div>
                             <span
-                              className={`badge ${report.status === "open" ? "badge-warning" : "badge-success"}`}
+                              className={`badge ${report.status === "pending" ? "badge-warning" : "badge-success"}`}
                             >
                               {report.status}
                             </span>
                           </div>
                           <p className="text-sm mb-3">{report.description}</p>
-                          {report.status === "open" && (
+                          {report.status === "pending" && (
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleDismissReport(report._id)}
@@ -641,14 +696,8 @@ export default function AdminDashboard() {
                                 Dismiss
                               </button>
                               <button
-                                onClick={() => handleWarnCreator(report._id)}
-                                className="btn btn-sm btn-warning"
-                              >
-                                Warn Creator
-                              </button>
-                              <button
                                 onClick={() =>
-                                  handleRemoveReportedPrompt(report._id)
+                                  handleRemoveReportedPrompt(report.promptId)
                                 }
                                 className="btn btn-sm btn-error"
                               >
