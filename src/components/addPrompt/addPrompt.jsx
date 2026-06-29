@@ -3,6 +3,7 @@ import { post } from "@/lib/api";
 import { useState } from "react";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "react-toastify";
+import Image from "next/image";
 
 export default function AddPrompt() {
   const { data: session } = useSession();
@@ -18,6 +19,40 @@ export default function AddPrompt() {
     visibility: "public",
     featured: false,
   });
+  const [imageUploading, setImageUploading] = useState(false);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setImageUploading(true);
+    try {
+      const formDataImg = new FormData();
+      formDataImg.append("image", file);
+
+      const res = await fetch(
+        `https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`,
+        {
+          method: "POST",
+          body: formDataImg,
+        },
+      );
+
+      const data = await res.json();
+
+      if (data.success) {
+        setFormData((prev) => ({
+          ...prev,
+          thumbnail: data.data.url, // ✅ imgbb থেকে URL আসবে
+        }));
+        toast.success("Image uploaded!");
+      }
+    } catch (err) {
+      toast.error("Image upload failed");
+    } finally {
+      setImageUploading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -143,14 +178,31 @@ export default function AddPrompt() {
       </div>
 
       <div className="form-field">
-        <label>Thumbnail Image URL</label>
+        <label>Thumbnail Image</label>
+
+        {/* File Input */}
         <input
-          type="text"
-          name="thumbnail"
-          value={formData.thumbnail}
-          onChange={handleChange}
-          className="input input-bordered w-full"
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+          className="file-input file-input-bordered w-full"
         />
+
+        {/* Loading */}
+        {imageUploading && (
+          <p className="text-sm text-gray-500 mt-1">Uploading... ⏳</p>
+        )}
+
+        {/* Preview */}
+        {formData.thumbnail && !imageUploading && (
+          <Image
+            src={formData.thumbnail}
+            alt="Thumbnail Preview"
+            width={160}
+            height={96}
+            className="mt-2 w-40 h-24 object-cover rounded-lg"
+          />
+        )}
       </div>
 
       <div className="form-field">

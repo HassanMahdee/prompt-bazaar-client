@@ -58,8 +58,9 @@ export async function patch(endpoint, data) {
   });
 }
 
-export async function del(endpoint) {
+export async function del(endpoint, data) {
   return fetchAPI(endpoint, {
     method: "DELETE",
+    body: JSON.stringify(data),
   });
 }

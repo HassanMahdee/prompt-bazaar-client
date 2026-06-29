@@ -106,19 +106,17 @@ const DashboardSidebar = ({ activeTab, onTabChange, dashboardType }) => {
         ))}
 
         {/* Role-specific links */}
-        {dashboardType === "user" &&
-          (session?.user?.role === "creator" ||
-            session?.user?.role === "admin") && (
-            <Link
-              href="/dashboard/creator"
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 text-left text-base-content/70 hover:text-base-content hover:bg-base-200"
-            >
-              <span className="w-8 h-8 rounded-lg bg-base-200 flex items-center justify-center shrink-0">
-                <FaPlus size={16} />
-              </span>
-              <span>Creator Dashboard</span>
-            </Link>
-          )}
+        {dashboardType === "user" && session?.user?.role === "creator" && (
+          <Link
+            href="/dashboard/creator"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 text-left text-base-content/70 hover:text-base-content hover:bg-base-200"
+          >
+            <span className="w-8 h-8 rounded-lg bg-base-200 flex items-center justify-center shrink-0">
+              <FaPlus size={16} />
+            </span>
+            <span>Creator Dashboard</span>
+          </Link>
+        )}
 
         {dashboardType === "user" && session?.user?.role === "admin" && (
           <Link

@@ -65,8 +65,7 @@ export default function Navbar() {
               <li>
                 <Link href="/dashboard">Dashboard</Link>
               </li>
-              {(session.user?.role === "creator" ||
-                session.user?.role === "admin") && (
+              {session.user?.role === "creator" && (
                 <li>
                   <Link href="/dashboard/creator">Creator Dashboard</Link>
                 </li>

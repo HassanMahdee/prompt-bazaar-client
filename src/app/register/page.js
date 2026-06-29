@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { AiOutlineGoogle } from "react-icons/ai";
+import { toast } from "react-toastify";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -38,15 +39,18 @@ export default function RegisterPage() {
   };
 
   const handleGoogleSignIn = async () => {
-    await authClient.signUp.social({
+    const { error } = await authClient.signIn.social({
       provider: "google",
-      callbackURL: "/dashboard",
+      callbackURL: "/",
       fetchOptions: {
         onSuccess: () => {
           router.push("/dashboard");
         },
       },
     });
+    if (error) {
+      toast.error(error.message);
+    }
   };
 
   return (

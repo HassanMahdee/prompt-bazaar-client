@@ -12,30 +12,6 @@ export default function PaymentPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const handleUpgrade = async () => {
-    if (!session) {
-      router.push("/login");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await post("/payments/payment-checkout-session", {
-        userEmail: session.user.email,
-      });
-      
-      if (response.url) {
-        window.location.href = response.url;
-      } else {
-        toast.error("Failed to create checkout session");
-      }
-    } catch (err) {
-      toast.error(err.message || "Failed to initiate payment");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="container-xy">
       <div className="max-w-4xl mx-auto">
@@ -51,8 +27,10 @@ export default function PaymentPage() {
           <div className="card bg-base-100 shadow-lg">
             <div className="card-body">
               <h2 className="card-title text-2xl mb-2">Free Plan</h2>
-              <div className="text-4xl font-bold mb-6">$0<span className="text-lg font-normal">/month</span></div>
-              
+              <div className="text-4xl font-bold mb-6">
+                $0<span className="text-lg font-normal">/month</span>
+              </div>
+
               <ul className="space-y-3 mb-6">
                 <li className="flex items-center gap-2">
                   <FaCheck className="text-success" />
@@ -93,8 +71,10 @@ export default function PaymentPage() {
                 <h2 className="card-title text-2xl">Premium Plan</h2>
                 <FaCrown className="text-yellow-300 text-2xl" />
               </div>
-              <div className="text-4xl font-bold mb-6">$5<span className="text-lg font-normal">/one-time</span></div>
-              
+              <div className="text-4xl font-bold mb-6">
+                $5<span className="text-lg font-normal">/one-time</span>
+              </div>
+
               <ul className="space-y-3 mb-6">
                 <li className="flex items-center gap-2">
                   <FaCheck className="text-yellow-300" />
@@ -121,20 +101,26 @@ export default function PaymentPage() {
                   <span>Ad-free experience</span>
                 </li>
               </ul>
-
-              <button
-                onClick={handleUpgrade}
-                disabled={loading || session?.user?.subscription === "premium"}
-                className="btn btn-secondary btn-block"
-              >
-                {loading ? (
-                  <span className="loading loading-spinner"></span>
-                ) : session?.user?.subscription === "premium" ? (
-                  "Already Premium"
-                ) : (
-                  "Upgrade Now"
-                )}
-              </button>
+              <form action="/api/checkout_sessions" method="POST">
+                <section>
+                  <button
+                    type="submit"
+                    role="link"
+                    disabled={
+                      loading || session?.user?.subscription === "premium"
+                    }
+                    className="btn btn-secondary btn-block"
+                  >
+                    {loading ? (
+                      <span className="loading loading-spinner"></span>
+                    ) : session?.user?.subscription === "premium" ? (
+                      "Already Premium"
+                    ) : (
+                      "Upgrade Now"
+                    )}
+                  </button>
+                </section>
+              </form>
             </div>
           </div>
         </div>
@@ -146,7 +132,8 @@ export default function PaymentPage() {
               <div className="text-left">
                 <h3 className="font-bold">Secure Payment</h3>
                 <p className="text-sm">
-                  Your payment is processed securely through Stripe. We never store your payment information.
+                  Your payment is processed securely through Stripe. We never
+                  store your payment information.
                 </p>
               </div>
             </div>

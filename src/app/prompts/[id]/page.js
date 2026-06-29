@@ -47,7 +47,7 @@ export default function PromptDetailPage({ params }) {
 
     const loadBookmarkStatus = async () => {
       try {
-        const data = await get(`/bookmarks/check/${promptId}`);
+        const data = await get(`/bookmarks/check/${promptId}/${session?.user?.email}`);
         setIsBookmarked(data.isBookmarked);
       } catch (err) {
         console.error("Bookmark check failed:", err);
@@ -72,11 +72,13 @@ export default function PromptDetailPage({ params }) {
   const handleBookmark = async () => {
     try {
       if (isBookmarked) {
-        await del(`/bookmarks/${promptId}`);
+        await del(`/bookmarks/${promptId}`, {
+          userEmail: session?.user?.email,
+        });
         setIsBookmarked(false);
         toast.success("Bookmark removed");
       } else {
-        await post("/bookmarks", { promptId });
+        await post("/bookmarks", { promptId, userEmail: session?.user?.email });
         setIsBookmarked(true);
         toast.success("Prompt bookmarked");
       }
@@ -91,6 +93,7 @@ export default function PromptDetailPage({ params }) {
         promptId,
         reason: reportReason,
         description: reportDescription,
+        userEmail: session?.user?.email,
       });
       toast.success("Report submitted successfully");
       setShowReportModal(false);

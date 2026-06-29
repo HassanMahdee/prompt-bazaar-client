@@ -58,7 +58,7 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       const data = await get("/user");
-      setUsers(data.data || []);
+      setUsers(data || []);
     } catch (err) {
       toast.error("Failed to load users");
     } finally {
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       const data = await get("/payments");
-      setPayments(data.data || []);
+      setPayments(data || []);
     } catch (err) {
       toast.error("Failed to load payments");
     } finally {
@@ -125,13 +125,13 @@ export default function AdminDashboard() {
           setAdminStats(data);
         } else if (activeTab === "users") {
           const data = await get("/user");
-          setUsers(data.data || []);
+          setUsers(data || []);
         } else if (activeTab === "all-prompts") {
           const data = await get("/prompts/all-prompts-admin");
           setAllPrompts(data.data || []);
         } else if (activeTab === "payments") {
           const data = await get("/payments");
-          setPayments(data.data || []);
+          setPayments(data || []);
         } else if (activeTab === "reports") {
           const data = await get("/reports");
           setReports(data.data || []);
@@ -632,17 +632,17 @@ export default function AdminDashboard() {
                       <tbody>
                         {payments.map((payment) => (
                           <tr key={payment._id}>
-                            <td>{payment.userEmail}</td>
+                            <td>{payment.customerEmail}</td>
                             <td>${payment.amount}</td>
                             <td>
                               <span
-                                className={`badge ${payment.status === "completed" ? "badge-success" : "badge-warning"}`}
+                                className={`badge ${payment.paymentStatus === "paid" ? "badge-success" : "badge-warning"}`}
                               >
-                                {payment.status}
+                                {payment.paymentStatus}
                               </span>
                             </td>
                             <td>
-                              {new Date(payment.createdAt).toLocaleDateString()}
+                              {new Date(payment.paidAt).toLocaleDateString()}
                             </td>
                           </tr>
                         ))}

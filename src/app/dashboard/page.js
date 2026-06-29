@@ -22,27 +22,19 @@ export default function UserDashboard() {
   const fetchBookmarks = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await get("/bookmarks");
+      const data = await get(`/bookmarks/${session?.user?.email}`);
       setBookmarks(data.data || []);
     } catch (err) {
       toast.error("Failed to load bookmarks");
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  const fetchUserProfile = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await get(`/user?email=${session?.user?.email}`);
-      setUserProfile(data[0]);
-    } catch (err) {
-      toast.error("Failed to load profile");
-    } finally {
-      setLoading(false);
-    }
   }, [session]);
 
+ const setUserProfileData = () => {
+    setUserProfile(session?.user);
+  };
+  
   const fetchMyReviews = useCallback(async () => {
     setLoading(true);
     try {
@@ -61,15 +53,11 @@ export default function UserDashboard() {
       fetchBookmarks();
     } else if (tab === "my-reviews") {
       fetchMyReviews();
+    } else {
+      setUserProfileData();
+      console.log("Profile tab", userProfile);
     }
   };
-
-  useEffect(() => {
-    if (session && !hasLoadedProfile.current) {
-      hasLoadedProfile.current = true;
-      setTimeout(() => fetchUserProfile(), 0);
-    }
-  }, [session, fetchUserProfile]);
 
   const handleRemoveBookmark = async (promptId) => {
     try {
@@ -146,7 +134,8 @@ export default function UserDashboard() {
                       <div className="avatar placeholder">
                         <div className="bg-neutral text-neutral-content rounded-full w-20">
                           <span className="text-2xl">
-                            {userProfile.name?.charAt(0).toUpperCase() || "U"}
+                            {session?.user?.name?.charAt(0).toUpperCase() ||
+                              "U"}{" "}
                           </span>
                         </div>
                       </div>
