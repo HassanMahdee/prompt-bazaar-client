@@ -125,7 +125,7 @@ export default function AdminDashboard() {
           setAdminStats(data.data);
         } else if (activeTab === "users") {
           const data = await get("/user");
-          setUsers(data.data || []);
+          setUsers(data || []);
         } else if (activeTab === "all-prompts") {
           const data = await get("/prompts");
           setAllPrompts(data.data || []);
@@ -145,11 +145,6 @@ export default function AdminDashboard() {
 
     loadData();
   }, [session, activeTab]);
-
-  const handleLogout = async () => {
-    await signOut();
-    router.push("/");
-  };
 
   const handleUpdateUserRole = async (userId, newRole) => {
     try {

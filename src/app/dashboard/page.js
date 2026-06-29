@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useSession, signOut } from "@/lib/auth-client";
+import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
@@ -15,7 +15,6 @@ export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState("add-prompt");
   const [bookmarks, setBookmarks] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
-  const [myPrompts, setMyPrompts] = useState([]);
   const [myReviews, setMyReviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const hasLoadedProfile = useRef(false);
@@ -36,22 +35,9 @@ export default function UserDashboard() {
     setLoading(true);
     try {
       const data = await get(`/user?email=${session?.user?.email}`);
-      console.log("User profile data:", data);
-      setUserProfile(data);
+      setUserProfile(data[0]);
     } catch (err) {
       toast.error("Failed to load profile");
-    } finally {
-      setLoading(false);
-    }
-  }, [session]);
-
-  const fetchMyPrompts = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await get(`/prompts/creator/${session?.user?.email}`);
-      setMyPrompts(data.data || []);
-    } catch (err) {
-      toast.error("Failed to load prompts");
     } finally {
       setLoading(false);
     }
@@ -60,23 +46,19 @@ export default function UserDashboard() {
   const fetchMyReviews = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await get(`/reviews/user/${session?.user?.email}`);
-      setMyReviews(data.data || []);
+      const data = await get(`/analytics/user-summary/${userProfile?.email}`);
+      setMyReviews(data.data.reviews || []);
     } catch (err) {
       toast.error("Failed to load reviews");
     } finally {
       setLoading(false);
     }
-  }, [session]);
+  }, [userProfile]);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     if (tab === "saved") {
       fetchBookmarks();
-    } else if (tab === "profile") {
-      fetchUserProfile();
-    } else if (tab === "my-prompts") {
-      fetchMyPrompts();
     } else if (tab === "my-reviews") {
       fetchMyReviews();
     }
@@ -89,29 +71,13 @@ export default function UserDashboard() {
     }
   }, [session, fetchUserProfile]);
 
-  const handleLogout = async () => {
-    await signOut();
-    router.push("/");
-  };
-
   const handleRemoveBookmark = async (promptId) => {
     try {
       await del(`/bookmarks/${promptId}`);
       toast.success("Bookmark removed");
-      fetchBookmarks();
+      setBookmarks(fetchBookmarks());
     } catch (err) {
       toast.error("Failed to remove bookmark");
-    }
-  };
-
-  const handleDeletePrompt = async (promptId) => {
-    if (!confirm("Are you sure you want to delete this prompt?")) return;
-    try {
-      await del(`/prompts/${promptId}`);
-      toast.success("Prompt deleted successfully");
-      fetchMyPrompts();
-    } catch (err) {
-      toast.error("Failed to delete prompt");
     }
   };
 
@@ -129,105 +95,6 @@ export default function UserDashboard() {
 
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto bg-base-200 p-8">
-        {activeTab === "add-prompt" && (
-          <>
-            <div className="card bg-base-100 shadow-lg">
-              <div className="card-body">
-                <h2 className="card-title text-2xl mb-4">Add Prompt</h2>
-                <p className="text-base-content/70 mb-6">
-                  Create a new prompt. Free users can add only 3 prompts.
-                </p>
-                <div className="alert alert-info mb-6">
-                  <span>
-                    All newly submitted prompts are automatically marked as
-                    pending and remain hidden from the marketplace until
-                    reviewed by an admin.
-                  </span>
-                </div>
-                <Link
-                  href="/dashboard/create-prompt"
-                  className="btn btn-primary w-full"
-                >
-                  <FaPlus className="mr-2" />
-                  Create New Prompt
-                </Link>
-              </div>
-            </div>
-          </>
-        )}
-
-        {activeTab === "my-prompts" && (
-          <>
-            <div className="card bg-base-100 shadow-lg">
-              <div className="card-body">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="card-title text-2xl">My Prompts</h2>
-                  <Link
-                    href="/dashboard/create-prompt"
-                    className="btn btn-primary"
-                  >
-                    <FaPlus className="mr-2" />
-                    Add New Prompt
-                  </Link>
-                </div>
-                {loading ? (
-                  <div className="flex justify-center py-12">
-                    <span className="loading loading-spinner loading-lg"></span>
-                  </div>
-                ) : myPrompts.length === 0 ? (
-                  <p className="text-base-content/70 text-center py-12">
-                    No prompts created yet
-                  </p>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="table">
-                      <thead>
-                        <tr>
-                          <th>Prompt Title</th>
-                          <th>Category</th>
-                          <th>Status</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {myPrompts.map((prompt) => (
-                          <tr key={prompt._id}>
-                            <td>{prompt.title}</td>
-                            <td>{prompt.category}</td>
-                            <td>
-                              <span
-                                className={`badge ${prompt.status === "published" ? "badge-success" : prompt.status === "rejected" ? "badge-error" : "badge-warning"}`}
-                              >
-                                {prompt.status}
-                              </span>
-                            </td>
-                            <td>
-                              <div className="flex gap-2">
-                                <Link
-                                  href={`/dashboard/edit-prompt/${prompt._id}`}
-                                  className="btn btn-sm btn-ghost"
-                                >
-                                  <FaEdit />
-                                </Link>
-                                <button
-                                  onClick={() => handleDeletePrompt(prompt._id)}
-                                  className="btn btn-sm btn-error btn-ghost"
-                                >
-                                  <FaTrash />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            </div>
-          </>
-        )}
-
         {activeTab === "my-reviews" && (
           <>
             <div className="card bg-base-100 shadow-lg">
@@ -245,7 +112,7 @@ export default function UserDashboard() {
                   <div className="space-y-3">
                     {myReviews.map((review) => (
                       <div
-                        key={review._id}
+                        key={review.promptId}
                         className="flex items-center justify-between p-3 bg-base-200 rounded-lg"
                       >
                         <div className="flex-1">
@@ -253,10 +120,10 @@ export default function UserDashboard() {
                             {review.promptTitle}
                           </h4>
                           <p className="text-sm text-base-content/70">
-                            Rating: {review.rating}/5
+                            Rating: {review.review.rating}/5
                           </p>
                           <p className="text-sm text-base-content/70 mt-1">
-                            {review.comment}
+                            {review.review.comment}
                           </p>
                         </div>
                       </div>

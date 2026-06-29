@@ -5,7 +5,6 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 async function getAuthToken() {
   const { data: session } = await authClient.getSession();
   return session?.session?.token || null;
-
 }
 
 export async function fetchAPI(endpoint, options = {}) {
@@ -42,7 +41,6 @@ export async function get(endpoint, params = {}) {
   );
 
   const queryString = new URLSearchParams(cleanParams).toString();
-
   return fetchAPI(queryString ? `${endpoint}?${queryString}` : endpoint);
 }
 
