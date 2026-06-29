@@ -26,7 +26,6 @@ export default function AddReview({ promptId, setPrompt }) {
       };
 
       const res = await post(`/prompts/${promptId}/reviews`, reviewData);
-      console.log(res.data);
       if (res.data) {
         setMessage("Review submitted successfully!");
         setPrompt(res.data);

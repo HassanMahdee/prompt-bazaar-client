@@ -55,7 +55,6 @@ export default function UserDashboard() {
       fetchMyReviews();
     } else {
       setUserProfileData();
-      console.log("Profile tab", userProfile);
     }
   };
 

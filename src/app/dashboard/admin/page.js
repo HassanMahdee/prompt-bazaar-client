@@ -212,7 +212,6 @@ export default function AdminDashboard() {
 
   const handleDismissReport = async (reportId) => {
     try {
-      console.log("Dismissing report:", reportId);
       await del(`/reports/${reportId}`);
       toast.success("Report dismissed successfully");
       fetchReports();

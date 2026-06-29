@@ -48,11 +48,9 @@ export default function CreatorDashboard() {
   const fetchAnalytics = useCallback(async () => {
     setLoading(true);
     try {
-      console.log("Fetching analytics for user:", session?.user?.email);
       const data = await get(
         `/analytics/creator-summary/${session?.user?.email}`,
       );
-      console.log("Analytics data:", data);
       setAnalytics(data);
     } catch (err) {
       toast.error("Failed to load analytics");

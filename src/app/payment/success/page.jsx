@@ -14,11 +14,9 @@ export default async function Success({ searchParams }) {
       expand: ["line_items", "payment_intent"],
     });
 
-  console.log(id, customer_email, status);
 
   const handlePymentSuccess = async () => {
     await post(`/payments/payment-success?sessionid=${session_id}`);
-    console.log("Payment success handled");
   };
 
   if (status === "complete") {

@@ -12,7 +12,6 @@ export default function PromptCard({ prompt }) {
     creatorId,
     _id,
   } = prompt;
-console.log(prompt);
   return (
     <div className="card card-border bg-base-100 shadow-lg hover:shadow-xl transition-shadow">
       <div className="card-body">

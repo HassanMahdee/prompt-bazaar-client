@@ -69,7 +69,6 @@ export default function AddPrompt() {
         userEmail: session?.user?.email || "",
       };
 
-      console.log(newPrompt);
 
       const res = await post("/prompts", newPrompt);
       if (res) {
