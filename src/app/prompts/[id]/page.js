@@ -271,7 +271,10 @@ export default function PromptDetailPage({ params }) {
               <p className="text-base-content/70">No reviews yet</p>
             )}
           </div>
-          <AddReview promptId={promptId} setPrompt={setPrompt} />
+          {prompt.visibility === "public" ||
+          session?.user?.subscription === "premium" ? (
+            <AddReview promptId={promptId} setPrompt={setPrompt} />
+          ) : null}
         </div>
       </div>
 

@@ -160,16 +160,10 @@ export default function UserDashboard() {
                           {userProfile.subscription}
                         </div>
                       </div>
-                      <div className="stat bg-base-200 rounded-lg">
-                        <div className="stat-title">Total Prompts</div>
-                        <div className="stat-value text-lg">
-                          {userProfile.promptCount || 0}
-                        </div>
-                      </div>
                     </div>
                     {userProfile.subscription === "free" && (
                       <div className="alert alert-info mt-4">
-                        <div className="flex items-center justify-between">
+                        <div className="flex gap-4 items-center justify-between">
                           <span>Upgrade to Premium for unlimited access</span>
                           <button
                             onClick={() => router.push("/payment")}

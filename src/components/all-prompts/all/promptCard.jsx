@@ -15,12 +15,12 @@ export default function PromptCard({ prompt }) {
   } = prompt;
   return (
     <div className="card card-border bg-base-100 shadow-lg hover:shadow-xl transition-shadow">
-      <div className="card-body">
+      <div className="card-body flex-col justify-between">
         <div className="flex justify-between items-start mb-2">
           <h2 className="card-title text-lg font-semibold line-clamp-2">
             {title}
           </h2>
-          <div className="badge badge-primary">{aiTool}</div>
+          <div className="badge badge-primary p-3">{aiTool}</div>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-3">

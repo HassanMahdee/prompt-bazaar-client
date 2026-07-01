@@ -42,7 +42,7 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     await signIn.social({
       provider: "google",
-      callbackURL: "/dashboard",
+      callbackURL: "/",
       fetchOptions: {
         onSuccess: () => {
           router.push("/dashboard");

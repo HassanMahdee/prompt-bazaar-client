@@ -51,6 +51,7 @@ export default function CreatorDashboard() {
       const data = await get(
         `/analytics/creator-summary/${session?.user?.email}`,
       );
+      console.log("analytics data:", data);
       setAnalytics(data);
     } catch (err) {
       toast.error("Failed to load analytics");
@@ -75,6 +76,7 @@ export default function CreatorDashboard() {
     setActiveTab(tab);
     if (tab === "analytics") {
       fetchAnalytics();
+      console.log("analytics:", analytics);
     } else if (tab === "my-prompts" && myPrompts.length === 0) {
       fetchMyPrompts();
     }
@@ -88,6 +90,7 @@ export default function CreatorDashboard() {
           const data = await get(
             `/analytics/creator-summary/${session.user.email}`,
           );
+          console.log("analytics data:", data);
           setAnalytics(data);
         } catch (err) {
           toast.error("Failed to load analytics");
